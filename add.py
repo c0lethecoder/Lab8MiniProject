@@ -73,8 +73,8 @@ chen_id = Account.query.filter_by(name="Chen Wei").first().id
 # Query course IDs
 math_id = Courses.query.filter_by(name="Math 141").first().id
 physics_id = Courses.query.filter_by(name="Physics 11").first().id
-cs106_id = Courses.query.filter_by(name="CSE 165").first().id
-cs162_id = Courses.query.filter_by(name="CSE 155").first().id
+cs165_id = Courses.query.filter_by(name="CSE 165").first().id
+cs155_id = Courses.query.filter_by(name="CSE 155").first().id
 
 # Grades
 grades = [
@@ -89,15 +89,16 @@ grades = [
     Grades(student_id=rohit_id, class_id=physics_id, grade=91),
     Grades(student_id=cole_id, class_id=physics_id, grade=88),
 
-    Grades(student_id=arjun_id, class_id=cs106_id, grade=93),
-    Grades(student_id=chen_id, class_id=cs106_id, grade=85),
-    Grades(student_id=olivia_id, class_id=cs106_id, grade=57),
-    Grades(student_id=lucas_id, class_id=cs106_id, grade=68),
+    Grades(student_id=arjun_id, class_id=cs165_id, grade=93),
+    Grades(student_id=chen_id, class_id=cs165_id, grade=85),
+    Grades(student_id=olivia_id, class_id=cs165_id, grade=57),
+    Grades(student_id=lucas_id, class_id=cs165_id, grade=68),
 
-    Grades(student_id=arjun_id, class_id=cs162_id, grade=99),
-    Grades(student_id=olivia_id, class_id=cs162_id, grade=87),
-    Grades(student_id=chen_id, class_id=cs162_id, grade=92),
-    Grades(student_id=rohit_id, class_id=cs162_id, grade=67)
+    Grades(student_id=arjun_id, class_id=cs155_id, grade=99),
+    Grades(student_id=olivia_id, class_id=cs155_id, grade=87),
+    Grades(student_id=chen_id, class_id=cs155_id, grade=92),
+    Grades(student_id=rohit_id, class_id=cs155_id, grade=67),
+    Grades(student_id=cole_id, class_id=cs155_id, grade=75)
 ]
 
 
