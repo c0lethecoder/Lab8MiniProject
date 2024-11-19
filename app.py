@@ -131,13 +131,13 @@ def load_user(user_id):
 @app.route('/index')
 @app.route('/')
 @login_required
-def index(): # put application's code here
+def index():
     if current_user.is_admin:
-        return render_template('admin_index.html')
+        return redirect('/admin')  # Redirect admin users directly to the Flask-Admin page
     elif current_user.is_teacher:
-        return render_template('teacher_index.html')
+        return render_template('teacher_index.html')  # Teacher-specific page
     else:
-        return render_template('index.html')
+        return render_template('index.html')  # Student-specific page
 
 @app.route('/login')
 def login_page():
