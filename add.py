@@ -34,7 +34,7 @@ teach3_id = Account.query.filter_by(username="teach3").first().id
 # Courses
 course1 = Courses(name="Math 141",
                   time="MW 9:00-10:50 AM",
-                  currentEnrollment=3,
+                  currentEnrollment=4,
                   maxEnrollment=10,
                   instructor_id=teach1_id)
 
@@ -46,7 +46,7 @@ course2 = Courses(name="Physics 11",
 
 course3 = Courses(name="CSE 165",
                   time="TR 2:00-2:50 PM",
-                  currentEnrollment=5,
+                  currentEnrollment=4,
                   maxEnrollment=10,
                   instructor_id=teach3_id)
 

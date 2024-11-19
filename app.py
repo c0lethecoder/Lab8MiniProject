@@ -4,6 +4,8 @@ from flask_sqlalchemy import SQLAlchemy
 from flask_admin.contrib import sqla
 from flask_admin.menu import MenuLink
 from flask_login import current_user, login_user, login_required, LoginManager, UserMixin, logout_user
+from wtforms import PasswordField
+import logging
 
 
 from sqlalchemy import inspect
@@ -11,9 +13,9 @@ from sqlalchemy import inspect
 app = Flask(__name__)
 
 # set optional bootswatch theme
-app.config['FLASK_ADMIN_SWATCH'] = 'cerulean'
-app.config["SQLALCHEMY_DATABASE_URI"] = "sqlite:///example.sqlite"
-app.secret_key = 'super secret key'
+app.config['FLASK_ADMIN_SWATCH'] = 'lumen'
+app.config["SQLALCHEMY_DATABASE_URI"] = "sqlite:///ohio.sqlite"
+app.secret_key = 'secret_key'
 app.app_context().push()
 db = SQLAlchemy(app)
 
@@ -21,7 +23,7 @@ db = SQLAlchemy(app)
 class Account(UserMixin, db.Model):
     id = db.Column(db.Integer, primary_key=True)
     username = db.Column(db.String, unique=True, nullable=False)
-    password = db.Column(db.String, unique=True, nullable=False)
+    password = db.Column(db.String, nullable=False)  # Plain text password
     name = db.Column(db.String, nullable=False)
     is_teacher = db.Column(db.Boolean, nullable=False)
     is_admin = db.Column(db.Boolean, nullable=False)
@@ -67,19 +69,31 @@ with app.app_context():
 class AccountModelView(sqla.ModelView):
     column_hide_backrefs = False
     column_list = ['id', 'username', 'name', 'is_teacher', 'is_admin']
+    form_columns = ['username', 'name', 'is_teacher', 'is_admin', 'password']  # Add password to form columns
+    can_edit = True
+    can_delete = True
+    form_excluded_columns = ['teaching', 'enrollment']
+
+    form_overrides = {
+        'password': PasswordField  # Allow password editing
+    }
 
     def is_accessible(self):
-        #return True  # to make new account after resetting DB
-        return current_user.get_id() and current_user.is_admin
+        return current_user.is_authenticated and current_user.is_admin
 
     def inaccessible_callback(self, name, **kwargs):
-        # redirect to login page if user doesn't have access
         return redirect(url_for('login', next=request.url))
+
+    def on_model_change(self, form, model, is_created):
+        if form.password.data:  # If the password field is updated, set it
+            model.password = form.password.data
 
 
 class CourseModelView(sqla.ModelView):
     column_hide_backrefs = False
     column_list = [c_attr.key for c_attr in inspect(Courses).mapper.column_attrs]
+    can_edit = True
+    can_delete = True
 
     def is_accessible(self):
         #return True  # to make new account after resetting DB
@@ -93,6 +107,8 @@ class CourseModelView(sqla.ModelView):
 class GradeModelView(sqla.ModelView):
     column_hide_backrefs = False
     column_list = [c_attr.key for c_attr in inspect(Grades).mapper.column_attrs]
+    can_edit = True
+    can_delete = True
 
     def is_accessible(self):
         #return True  # to make new account after resetting DB
@@ -112,12 +128,12 @@ class LoginMenuLink(MenuLink):
     def is_accessible(self):
         return not current_user.is_authenticated
 
-admin = Admin(app, name='gradebook', template_mode='bootstrap3')
+admin = Admin(app, name='gradebook', template_mode='bootstrap4')
 admin.add_view(AccountModelView(Account, db.session))
 admin.add_view(CourseModelView(Courses, db.session))
 admin.add_view(GradeModelView(Grades, db.session))
 admin.add_link(LoginMenuLink(name='Return to Login Page', category='', url="/login"))
-admin.add_link(LogoutMenuLink(name='Return to Homepage', category='', url="/index"))
+#admin.add_link(LogoutMenuLink(name='Return to Homepage', category='', url="/index"))
 admin.add_link(LogoutMenuLink(name='Logout', category='', url="/logout"))
 
 login_manager = LoginManager()
@@ -133,9 +149,9 @@ def load_user(user_id):
 @login_required
 def index():
     if current_user.is_admin:
-        return redirect('/admin')  # Redirect admin users directly to the Flask-Admin page
+        return redirect('/admin')  
     elif current_user.is_teacher:
-        return render_template('teacher_index.html')  # Teacher-specific page
+        return render_template('teacher_index.html')  
     else:
         return render_template('index.html')  # Student-specific page
 
